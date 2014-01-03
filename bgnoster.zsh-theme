@@ -148,10 +148,12 @@ prompt_virtualenv() {
 # - are there background jobs?
 prompt_status() {
   local symbols
+	local jobs
+	jobs=$(jobs -l | wc -l)
   symbols=()
   [[ $RETVAL -ne 0 ]] && symbols+="%{%F{red}%}✘${RETVAL}"
   [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
-  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
+  [[ $jobs -gt 0 ]] && symbols+="%{%F{cyan}%}⚙${jobs}"
 
   [[ -n "$symbols" ]] && prompt_segment 247 white "$symbols"
 }
