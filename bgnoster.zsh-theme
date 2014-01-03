@@ -26,7 +26,9 @@
 # A few utility functions to make it easy and re-usable to draw segmented prompts
 
 CURRENT_BG='NONE'
+CURRENT_BG_R='NONE'
 SEGMENT_SEPARATOR=''
+SEGMENT_SEPARATOR_R=''
 
 # Begin a segment
 # Takes two arguments, background and foreground. Both can be omitted,
@@ -37,6 +39,21 @@ prompt_segment() {
   [[ -n $2 ]] && fg="%F{$2}" || fg="%f"
   if [[ $CURRENT_BG != 'NONE' && $1 != $CURRENT_BG ]]; then
     echo -n "%{$bg%F{$CURRENT_BG}%}$SEGMENT_SEPARATOR%{$fg%}"
+  else
+    echo -n "%{$bg%}%{$fg%}"
+  fi
+  CURRENT_BG=$1
+  [[ -n $3 ]] && echo -n $3
+}
+# Begin a segment for the RPROMPT
+# Takes two arguments, background and foreground. Both can be omitted,
+# rendering default background/foreground.
+rprompt_segment() {
+  local bg fg
+  [[ -n $1 ]] && bg="%K{$1}" || bg="%k"
+  [[ -n $2 ]] && fg="%F{$2}" || fg="%f"
+  if [[ $CURRENT_BG != 'NONE' && $1 != $CURRENT_BG ]]; then
+    echo -n "%{$bg%F{$CURRENT_BG}%}$SEGMENT_SEPARATOR_R%{$fg%}"
   else
     echo -n "%{$bg%}%{$fg%}"
   fi
