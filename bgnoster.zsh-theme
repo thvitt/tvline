@@ -35,6 +35,12 @@ SEGMENT_SEPARATOR_R=''
 # rendering default background/foreground.
 prompt_segment() {
   local bg fg
+	if [[ -n $1 && $1 == r ]]
+	then
+		shift
+		rprompt_segment $@
+		return
+	fi
   [[ -n $1 ]] && bg="%K{$1}" || bg="%k"
   [[ -n $2 ]] && fg="%F{$2}" || fg="%f"
   if [[ $CURRENT_BG != 'NONE' && $1 != $CURRENT_BG ]]; then
@@ -52,12 +58,10 @@ rprompt_segment() {
   local bg fg
   [[ -n $1 ]] && bg="%K{$1}" || bg="%k"
   [[ -n $2 ]] && fg="%F{$2}" || fg="%f"
-  if [[ $CURRENT_BG != 'NONE' && $1 != $CURRENT_BG ]]; then
-    echo -n "%{$bg%F{$CURRENT_BG}%}$SEGMENT_SEPARATOR_R%{$fg%}"
-  else
-    echo -n "%{$bg%}%{$fg%}"
-  fi
-  CURRENT_BG=$1
+
+	echo -n "%{%K{$CURRENT_BG_R}%F{$1}%}$SEGMENT_SEPARATOR_R%{$bg$fg%}"
+	
+  CURRENT_BG_R=$1
   [[ -n $3 ]] && echo -n $3
 }
 
@@ -91,9 +95,9 @@ prompt_git() {
     dirty=$(parse_git_dirty)
     ref=$(git symbolic-ref HEAD 2> /dev/null) || ref="➦$(git show-ref --head -s --abbrev |head -n1 2> /dev/null)"
     if [[ -n $dirty ]]; then
-      prompt_segment yellow black
+      prompt_segment $1 yellow black
     else
-      prompt_segment green black
+      prompt_segment $1 green black
     fi
 
     setopt promptsubst
@@ -148,14 +152,14 @@ prompt_hg() {
 
 # Dir: current working directory
 prompt_dir() {
-  prompt_segment 250 black '%30<…<%~'
+  prompt_segment $1 250 black '%30<…<%~'
 }
 
 # Virtualenv: current working virtualenv
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
   if [[ -n $virtualenv_path && -z $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
-    prompt_segment blue black "(`basename $virtualenv_path`)"
+    prompt_segment $1 blue black "(`basename $virtualenv_path`)"
   fi
 }
 
@@ -172,19 +176,23 @@ prompt_status() {
   [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
   [[ $jobs -gt 0 ]] && symbols+="%{%F{cyan}%}⚙${jobs}"
 
-  [[ -n "$symbols" ]] && prompt_segment 247 white "$symbols"
+  [[ -n "$symbols" ]] && prompt_segment $1 247 white "$symbols"
 }
 
 ## Main prompt
 build_prompt() {
   RETVAL=$?
-  prompt_status
   prompt_virtualenv
   prompt_context
   prompt_dir
-  prompt_git
   prompt_hg
   prompt_end
 }
+build_rprompt() {
+	RETVAL=$?
+  prompt_status r
+  prompt_git r
+}
 
-PROMPT='%{%f%b%k%}$(build_prompt) '
+export PROMPT='%{%f%b%k%}$(build_prompt)'
+export RPROMPT='%{%f%b%k%}$(build_rprompt)'
