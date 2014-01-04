@@ -1,17 +1,17 @@
 # vim:ft=zsh ts=2 sw=2 sts=2
 #
-# agnoster's Theme - https://gist.github.com/3712874
-# A Powerline-inspired theme for ZSH
+# Thorsten's Powerline Inspired Prompt Theme for ZSH
+# --------------------------------------------------
+#
+# This is derived from agnoster's Theme - https://gist.github.com/3712874
 #
 # # README
 #
 # In order for this theme to render correctly, you will need a
 # [Powerline-patched font](https://gist.github.com/1595572).
 #
-# In addition, I recommend the
-# [Solarized theme](https://github.com/altercation/solarized/) and, if you're
-# using it on Mac OS X, [iTerm 2](http://www.iterm2.com/) over Terminal.app -
-# it has significantly better color fidelity.
+# In addition, it is currently only tested on a gnome-terminal with
+# TERM=xterm-256color and a black-on-white theme.
 #
 # # Goals
 #
@@ -21,6 +21,13 @@
 # hostname to whether the last call exited with an error to whether background
 # jobs are running in this shell will all be displayed automatically when
 # appropriate.
+#
+# There are a few modifications to agnoster's:
+#
+# * Space optimized – most whitespace removed
+# * RPROMPT support – much of the information moves to the right side (which hides automatically when typing longer commands)
+# * path is left-truncated if the left prompt would be too long
+# * more details in the optional status (number of bg jobs etc.)
 
 ### Segment drawing
 # A few utility functions to make it easy and re-usable to draw segmented prompts
