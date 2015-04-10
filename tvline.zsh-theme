@@ -91,7 +91,7 @@ prompt_context() {
   local user=`whoami`
 
   if [[ "$user" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
-    prompt_segment 245 white "%(!.%{%F{yellow}%}.)$user@%m"
+    prompt_segment black white "%(!.%{%F{yellow}%}.)$user@%m"
   fi
 }
 
@@ -116,7 +116,7 @@ prompt_git() {
     zstyle ':vcs_info:*' stagedstr '✚'
     zstyle ':vcs_info:git:*' unstagedstr '●'
     zstyle ':vcs_info:*' formats '%u%c'
-    zstyle ':vcs_info:*' actionformats '%u%c'
+    zstyle ':vcs_info:*' actionformats '%a:%u%c'
     vcs_info
     echo -n "${ref/refs\/heads\//±}${vcs_info_msg_0_}"
   fi
@@ -159,7 +159,7 @@ prompt_hg() {
 
 # Dir: current working directory
 prompt_dir() {
-  prompt_segment $1 250 black '%30<…<%~'
+  prompt_segment $1 7 black '%30<…<%~'
 }
 
 # Virtualenv: current working virtualenv
@@ -183,7 +183,7 @@ prompt_status() {
   [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
   [[ $jobs -gt 0 ]] && symbols+="%{%F{cyan}%}⚙${jobs}"
 
-  [[ -n "$symbols" ]] && prompt_segment $1 247 white "$symbols"
+  [[ -n "$symbols" ]] && prompt_segment $1 8 white "$symbols"
 }
 
 ## Main prompt
