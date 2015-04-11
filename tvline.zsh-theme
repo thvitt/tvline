@@ -31,6 +31,17 @@
 
 ### Segment drawing
 # A few utility functions to make it easy and re-usable to draw segmented prompts
+#
+# Powerline characters:
+#  57504 uniE0A0 Private Use
+#  57505 uniE0A1 Private Use
+#  57506 uniE0A2 Private Use
+# █ 9608 block FULL BLOCK
+#  57520 uniE0B0 Private Use
+#  57521 uniE0B1 Private Use
+#  57522 uniE0B2 Private Use
+#  57523 uniE0B3 Private Use
+#
 
 CURRENT_BG='NONE'
 CURRENT_BG_R='NONE'
@@ -95,12 +106,45 @@ prompt_context() {
   fi
 }
 
+# next two functions are from http://eseth.org/2010/git-in-zsh.html
+# Show remote ref name and number of commits ahead-of or behind
+function +vi-git-st() {
+    local ahead behind remote
+    local -a gitstatus
+
+    # Are we on a remote-tracking branch?
+    remote=${$(git rev-parse --verify ${hook_com[branch]}@{upstream} \
+        --symbolic-full-name 2>/dev/null)/refs\/remotes\/}
+
+    if [[ -n ${remote} ]] ; then
+        # for git prior to 1.7
+        # ahead=$(git rev-list origin/${hook_com[branch]}..HEAD | wc -l)
+        ahead=$(git rev-list ${hook_com[branch]}@{upstream}..HEAD 2>/dev/null | wc -l)
+        (( $ahead )) && gitstatus+=( "↑${ahead}" )
+
+        # for git prior to 1.7
+        # behind=$(git rev-list HEAD..origin/${hook_com[branch]} | wc -l)
+        behind=$(git rev-list HEAD..${hook_com[branch]}@{upstream} 2>/dev/null | wc -l)
+        (( $behind )) && gitstatus+=( "↓${behind}" )
+
+        hook_com[branch]="${hook_com[branch]}${(j:/:)gitstatus}"
+    fi
+}
+# Show count of stashed changes
+function +vi-git-stash() {
+    local -a stashes
+
+    if [[ -s ${hook_com[base]}/.git/refs/stash ]] ; then
+        stashes=$(git stash list 2>/dev/null | wc -l)
+        hook_com[misc]+=" (${stashes} stashed)"
+    fi
+}
+
 # Git: branch/detached head, dirty status
 prompt_git() {
   local ref dirty
   if $(git rev-parse --is-inside-work-tree >/dev/null 2>&1); then
     dirty=$(parse_git_dirty)
-    ref=$(git symbolic-ref HEAD 2> /dev/null) || ref="➦$(git show-ref --head -s --abbrev |head -n1 2> /dev/null)"
     if [[ -n $dirty ]]; then
       prompt_segment $1 yellow black
     else
@@ -115,10 +159,11 @@ prompt_git() {
     zstyle ':vcs_info:*' check-for-changes true
     zstyle ':vcs_info:*' stagedstr '✚'
     zstyle ':vcs_info:git:*' unstagedstr '●'
-    zstyle ':vcs_info:*' formats '%u%c'
+    zstyle ':vcs_info:*' formats '%b%u%c'
     zstyle ':vcs_info:*' actionformats '%a:%u%c'
+		zstyle ':vcs_info:git*+set-message:*' hooks git-st git-stash
     vcs_info
-    echo -n "${ref/refs\/heads\//±}${vcs_info_msg_0_}"
+    echo -n "${vcs_info_msg_0_}"
   fi
 }
 
