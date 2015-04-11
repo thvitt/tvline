@@ -163,10 +163,12 @@ prompt_dir() {
 }
 
 # Virtualenv: current working virtualenv
+# Turn off virtualenv's own prompt manipulation
+VIRTUAL_ENV_DISABLE_PROMPT=1
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
-  if [[ -n $virtualenv_path && -z $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
-    prompt_segment $1 blue black "(`basename $virtualenv_path`)"
+  if [[ -n $virtualenv_path ]]; then
+    prompt_segment $1 blue white "(`basename $virtualenv_path`)"
   fi
 }
 
@@ -189,7 +191,6 @@ prompt_status() {
 ## Main prompt
 build_prompt() {
   RETVAL=$?
-  prompt_virtualenv
   prompt_context
   prompt_dir
   prompt_hg
@@ -199,6 +200,7 @@ build_rprompt() {
 	RETVAL=$?
   prompt_status r
   prompt_git r
+  prompt_virtualenv r
 }
 
 export PROMPT='%{%f%b%k%}$(build_prompt)'
