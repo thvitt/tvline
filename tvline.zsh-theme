@@ -100,7 +100,7 @@ function +vi-git-st() {
         behind=$(git rev-list HEAD..${hook_com[branch]}@{upstream} 2>/dev/null | wc -l)
         (( $behind )) && gitstatus+=( "↓${behind}" )
 
-        hook_com[branch]="${hook_com[branch]}${(j:/:)gitstatus}"
+        hook_com[branch]="${hook_com[branch]}${(j:/:)gitstatus}"
     fi
 }
 # Show count of stashed changes
@@ -109,7 +109,7 @@ function +vi-git-stash() {
 
     if [[ -s ${hook_com[base]}/.git/refs/stash ]] ; then
         stashes=$(git stash list 2>/dev/null | wc -l)
-        hook_com[misc]+=" (${stashes} stashed)"
+        hook_com[misc]+=" ☰ ${stashes}"
     fi
 }
 
@@ -121,7 +121,7 @@ prompt_git() {
     if [[ -n $dirty ]]; then
       prompt_segment $1 yellow black
     else
-      prompt_segment $1 green black
+      prompt_segment $1 green white
     fi
 
     setopt promptsubst
@@ -130,10 +130,10 @@ prompt_git() {
     zstyle ':vcs_info:*' enable git
     zstyle ':vcs_info:*' get-revision true
     zstyle ':vcs_info:*' check-for-changes true
-    zstyle ':vcs_info:*' stagedstr '✚'
-    zstyle ':vcs_info:git:*' unstagedstr '●'
-    zstyle ':vcs_info:*' formats '%b%u%c'
-    zstyle ':vcs_info:*' actionformats '%a:%u%c'
+    zstyle ':vcs_info:*' stagedstr '+'
+    zstyle ':vcs_info:git:*' unstagedstr '✎'
+    zstyle ':vcs_info:*' formats '%b%u%c%m'
+    zstyle ':vcs_info:*' actionformats '%a:%u%c%m'
 		zstyle ':vcs_info:git*+set-message:*' hooks git-st git-stash
     vcs_info
     echo -n "${vcs_info_msg_0_}"
@@ -203,7 +203,7 @@ prompt_status() {
   [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
   [[ $jobs -gt 0 ]] && symbols+="%{%F{cyan}%}⚙${jobs}"
 
-  [[ -n "$symbols" ]] && prompt_segment $1 8 white "$symbols"
+  [[ -n "$symbols" ]] && prompt_segment $1 7 white "$symbols"
 }
 
 ## Main prompt
