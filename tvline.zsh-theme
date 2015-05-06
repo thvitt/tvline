@@ -186,7 +186,7 @@ VIRTUAL_ENV_DISABLE_PROMPT=1
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
   if [[ -n $virtualenv_path ]]; then
-    prompt_segment $1 blue white "(`basename $virtualenv_path`)"
+    prompt_segment $1 blue white "`basename $virtualenv_path`"
   fi
 }
 
