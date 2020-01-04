@@ -117,13 +117,6 @@ function +vi-git-stash() {
 prompt_git() {
   local ref dirty
   if $(git rev-parse --is-inside-work-tree >/dev/null 2>&1); then
-    dirty=$(parse_git_dirty)
-    if [[ -n $dirty ]]; then
-      prompt_segment $1 yellow black
-    else
-      prompt_segment $1 green white
-    fi
-
     setopt promptsubst
     autoload -Uz vcs_info
 
@@ -132,10 +125,19 @@ prompt_git() {
     zstyle ':vcs_info:*' check-for-changes true
     zstyle ':vcs_info:*' stagedstr '+'
     zstyle ':vcs_info:git:*' unstagedstr '✎'
-    zstyle ':vcs_info:*' formats '%b%u%c%m'
-    zstyle ':vcs_info:*' actionformats '%a:%u%c%m'
+
+		# use format _1_ to indicate dirty state
+    zstyle ':vcs_info:*' formats '%b%u%c%m' '%c%u'
+    zstyle ':vcs_info:*' actionformats '%a:%u%c%m' '%c%u' 
 		zstyle ':vcs_info:git*+set-message:*' hooks git-st git-stash
     vcs_info
+		
+		if [[ -n "${vcs_info_msg_1_}" ]]; then
+			prompt_segment $1 yellow black
+		else
+			prompt_segment $1 green white
+		fi
+
     echo -n "${vcs_info_msg_0_}"
   fi
 }
